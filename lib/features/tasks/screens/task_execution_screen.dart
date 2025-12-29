@@ -140,6 +140,18 @@ class _TaskExecutionScreenState extends State<TaskExecutionScreen>
       _isInitialized = true;
       _isLoadingWeb = true;
       _isStartingTask = false;
+      _error = null;
+    });
+
+    // Timeout logic
+    Future.delayed(const Duration(seconds: 30), () {
+      if (mounted && _isLoadingWeb) {
+        setState(() {
+          _isLoadingWeb = false;
+          _error =
+              'Muda wa kupakia umeisha. Tafadhali jaribu tena au angalia mtandao wako.';
+        });
+      }
     });
 
     _controller = WebViewController()
@@ -191,14 +203,19 @@ class _TaskExecutionScreenState extends State<TaskExecutionScreen>
           },
           onWebResourceError: (WebResourceError error) {
             debugPrint('=== WEBVIEW ERROR: ${error.description} ===');
-            if (mounted) {
-              // Start timer anyway even if there's an error
-              if (_timer == null) {
-                _startTimer();
+            // Only show error if it's a critical failure and we haven't loaded yet
+            if (mounted && _timer == null) {
+              // If it's a timeout or connection error, show error state
+              if (error.description.contains('net::ERR_CONNECTION_TIMED_OUT') ||
+                  error.description.contains('net::ERR_NAME_NOT_RESOLVED') ||
+                  error.description.contains(
+                    'net::ERR_INTERNET_DISCONNECTED',
+                  )) {
+                setState(() {
+                  _isLoadingWeb = false;
+                  _error = 'Tatizo la mtandao: ${error.description}';
+                });
               }
-              setState(() {
-                _isLoadingWeb = false;
-              });
             }
           },
         ),

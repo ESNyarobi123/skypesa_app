@@ -258,13 +258,18 @@ class CustomDrawer extends StatelessWidget {
                                               size: 12,
                                             ),
                                             const SizedBox(width: 4),
-                                            Text(
-                                              user?.subscription?.displayName ??
-                                                  'Free',
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w600,
+                                            Flexible(
+                                              child: Text(
+                                                user
+                                                        ?.subscription
+                                                        ?.displayName ??
+                                                    'Free',
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
                                           ],
@@ -490,17 +495,7 @@ class CustomDrawer extends StatelessWidget {
                     ).animate().fadeIn(delay: 800.ms).slideY(begin: 0.2),
                   ),
 
-                  // App version
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Text(
-                      'SKYpesa v1.0.0',
-                      style: TextStyle(
-                        color: AppColors.textTertiary,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ),
+                  // App version removed as requested
                 ],
               ),
             ),
@@ -894,6 +889,8 @@ class _ModernDrawerItem extends StatelessWidget {
                             ? FontWeight.bold
                             : FontWeight.w500,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     if (subtitle != null) ...[
                       const SizedBox(height: 2),
@@ -905,6 +902,8 @@ class _ModernDrawerItem extends StatelessWidget {
                               : AppColors.textTertiary,
                           fontSize: 11,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ],

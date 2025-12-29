@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../leaderboard/screens/leaderboard_screen.dart';
+import '../../notifications/services/notification_service.dart';
+import '../../notifications/widgets/announcement_dialog.dart';
 import '../../tasks/screens/tasks_screen.dart';
 import '../../team/screens/team_screen.dart';
 import '../../wallet/screens/wallet_screen.dart';
@@ -21,6 +24,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  int _unreadCount = 0;
 
   final List<Widget> _screens = [
     const DashboardScreen(),
@@ -38,11 +42,69 @@ class _MainScreenState extends State<MainScreen> {
     'Leaderboard',
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _checkUnreadNotifications();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AnnouncementDialog.showIfAvailable(context);
+    });
+  }
+
+  Future<void> _checkUnreadNotifications() async {
+    final service = NotificationService();
+    final result = await service.getUnreadCount();
+    if (mounted) {
+      setState(() => _unreadCount = result.count);
+    }
+  }
+
   String _getGreeting() {
     final hour = DateTime.now().hour;
     if (hour < 12) return 'Good Morning';
     if (hour < 17) return 'Good Afternoon';
     return 'Good Evening';
+  }
+
+  Widget _buildNotificationIcon() {
+    return GestureDetector(
+      onTap: () async {
+        await Navigator.pushNamed(context, '/notifications');
+        _checkUnreadNotifications();
+      },
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: AppColors.surface.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+        ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            const Icon(
+              Icons.notifications_rounded,
+              color: Colors.white,
+              size: 20,
+            ),
+            if (_unreadCount > 0)
+              Positioned(
+                top: -2,
+                right: -2,
+                child: Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: AppColors.error,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.card, width: 1.5),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -85,6 +147,8 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ),
               actions: [
+                _buildNotificationIcon(),
+                const Gap(12),
                 // My Account Button
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
@@ -239,6 +303,10 @@ class _MainScreenState extends State<MainScreen> {
                             ),
                           ),
                         ),
+
+                        // Notification Icon
+                        _buildNotificationIcon(),
+                        const Gap(12),
 
                         // My Account Button
                         GestureDetector(

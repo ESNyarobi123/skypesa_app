@@ -624,6 +624,23 @@ class _TasksScreenState extends State<TasksScreen> {
             task: task,
             index: index,
             onTap: () {
+              if (provider.isOnCooldown) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Subiri sekunde ${provider.cooldownSeconds} kabla ya kuanza task nyingine.',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    backgroundColor: AppColors.warning,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                );
+                return;
+              }
+
               if (task.canComplete && task.remaining > 0) {
                 Navigator.pushNamed(
                   context,

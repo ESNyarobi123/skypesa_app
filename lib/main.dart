@@ -12,6 +12,7 @@ import 'features/home/providers/dashboard_provider.dart';
 import 'features/profile/screens/profile_screen.dart';
 import 'features/support/screens/support_screen.dart';
 import 'features/support/screens/ticket_detail_screen.dart';
+import 'features/notifications/screens/notifications_screen.dart';
 import 'features/leaderboard/providers/leaderboard_provider.dart';
 
 import 'features/tasks/providers/task_provider.dart';
@@ -96,6 +97,7 @@ class MyApp extends StatelessWidget {
         '/forgot-password': (context) => const ForgotPasswordScreen(),
         '/support': (context) => const SupportScreen(),
         '/profile': (context) => const ProfileScreen(),
+        '/notifications': (context) => const NotificationsScreen(),
       },
     );
   }

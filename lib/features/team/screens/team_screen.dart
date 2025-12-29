@@ -265,15 +265,20 @@ class _TeamScreenState extends State<TeamScreen> {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: Colors.white, size: 16),
-              const Gap(6),
-              Text(
-                value,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              Icon(icon, color: Colors.white, size: 14),
+              const Gap(4),
+              Flexible(
+                child: Text(
+                  value,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
               ),
             ],
@@ -283,7 +288,7 @@ class _TeamScreenState extends State<TeamScreen> {
             label,
             style: TextStyle(
               color: Colors.white.withOpacity(0.8),
-              fontSize: 11,
+              fontSize: 10,
             ),
           ),
         ],
@@ -882,11 +887,15 @@ class _TeamScreenState extends State<TeamScreen> {
                             color: AppColors.textTertiary,
                           ),
                           const Gap(4),
-                          Text(
-                            user['joined_at']?.toString() ?? '',
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 12,
+                          Flexible(
+                            child: Text(
+                              user['joined_at']?.toString() ?? '',
+                              style: TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 12,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
