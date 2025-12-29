@@ -72,15 +72,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color(0xFF1A237E), // Deep Indigo
-                Color(0xFF00796B), // Teal
-                Color(0xFF00E676), // Emerald
+                AppColors.secondaryDark, // Deep Teal
+                AppColors.primaryDark, // Teal
+                AppColors.primary, // Emerald
               ],
-              stops: [0.0, 0.5, 1.0],
+              stops: const [0.0, 0.5, 1.0],
             ),
             borderRadius: BorderRadius.circular(28),
             boxShadow: [
@@ -335,10 +335,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             icon: Icons.groups_rounded,
             label: 'Referrals',
             value: provider.referralCount.toString(),
-            color: const Color(0xFF7C4DFF),
+            color: AppColors.accent,
             gradientColors: [
-              const Color(0xFF7C4DFF).withOpacity(0.2),
-              const Color(0xFF536DFE).withOpacity(0.05),
+              AppColors.accent.withOpacity(0.2),
+              AppColors.secondaryDark.withOpacity(0.05),
             ],
           ),
         ),
@@ -348,10 +348,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             icon: Icons.bolt_rounded,
             label: 'Per Task',
             value: 'TZS ${provider.rewardPerTask.toStringAsFixed(0)}',
-            color: const Color(0xFFFFD700),
+            color: AppColors.primary,
             gradientColors: [
-              const Color(0xFFFFD700).withOpacity(0.2),
-              const Color(0xFFFFA000).withOpacity(0.05),
+              AppColors.primary.withOpacity(0.2),
+              AppColors.primaryDark.withOpacity(0.05),
             ],
           ),
         ),
@@ -692,10 +692,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 label: 'This Week',
                 amount: provider.weekEarnings,
                 icon: Icons.date_range_rounded,
-                color: const Color(0xFF448AFF),
+                color: AppColors.secondary,
                 gradientColors: [
-                  const Color(0xFF448AFF).withOpacity(0.2),
-                  const Color(0xFF2962FF).withOpacity(0.05),
+                  AppColors.secondary.withOpacity(0.2),
+                  AppColors.secondaryDark.withOpacity(0.05),
                 ],
               ),
             ),
@@ -706,10 +706,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           label: 'This Month',
           amount: provider.monthEarnings,
           icon: Icons.calendar_month_rounded,
-          color: const Color(0xFFFFD700),
+          color: AppColors.accent,
           gradientColors: [
-            const Color(0xFFFFD700).withOpacity(0.15),
-            const Color(0xFFFFA000).withOpacity(0.05),
+            AppColors.accent.withOpacity(0.15),
+            AppColors.secondaryDark.withOpacity(0.05),
           ],
           isLarge: true,
         ),
@@ -807,9 +807,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF7C4DFF), Color(0xFF536DFE)],
-                ),
+                gradient: AppColors.accentGradient,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -836,10 +834,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: _buildActionButton(
                 icon: Icons.workspace_premium_rounded,
                 label: 'Upgrade',
-                color: const Color(0xFFFFD700),
+                color: AppColors.primary,
                 gradientColors: [
-                  const Color(0xFFFFD700).withOpacity(0.2),
-                  const Color(0xFFFFA000).withOpacity(0.05),
+                  AppColors.primary.withOpacity(0.2),
+                  AppColors.primaryDark.withOpacity(0.05),
                 ],
                 onTap: () => Navigator.pushNamed(context, '/plans'),
               ),
@@ -849,10 +847,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: _buildActionButton(
                 icon: Icons.people_alt_rounded,
                 label: 'Invite',
-                color: const Color(0xFF448AFF),
+                color: AppColors.secondary,
                 gradientColors: [
-                  const Color(0xFF448AFF).withOpacity(0.2),
-                  const Color(0xFF2962FF).withOpacity(0.05),
+                  AppColors.secondary.withOpacity(0.2),
+                  AppColors.secondaryDark.withOpacity(0.05),
                 ],
                 onTap: () {},
               ),

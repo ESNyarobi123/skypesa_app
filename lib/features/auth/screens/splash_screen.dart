@@ -27,13 +27,32 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!mounted) return;
 
     // Check auth status
-    await context.read<AuthProvider>().checkAuthStatus();
+    final authProvider = context.read<AuthProvider>();
+    await authProvider.checkAuthStatus();
 
     if (!mounted) return;
 
-    if (context.read<AuthProvider>().isAuthenticated) {
-      Navigator.pushReplacementNamed(context, '/dashboard');
+    debugPrint('=== SPLASH SCREEN AUTH CHECK ===');
+    debugPrint('isAuthenticated: ${authProvider.isAuthenticated}');
+    debugPrint('isBlocked: ${authProvider.isBlocked}');
+    debugPrint('blockedInfo: ${authProvider.blockedInfo}');
+    debugPrint('blockedInfo.isBlocked: ${authProvider.blockedInfo?.isBlocked}');
+
+    if (authProvider.isAuthenticated) {
+      // Check if user is blocked
+      if (authProvider.isBlocked && authProvider.blockedInfo != null) {
+        debugPrint('>>> Navigating to BLOCKED screen');
+        Navigator.pushReplacementNamed(
+          context,
+          '/blocked',
+          arguments: authProvider.blockedInfo,
+        );
+      } else {
+        debugPrint('>>> Navigating to DASHBOARD');
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      }
     } else {
+      debugPrint('>>> Navigating to LOGIN');
       Navigator.pushReplacementNamed(context, '/login');
     }
   }

@@ -121,7 +121,7 @@ class _TeamScreenState extends State<TeamScreen> {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE91E63).withOpacity(0.3),
+            color: AppColors.primary.withOpacity(0.3),
             blurRadius: 30,
             offset: const Offset(0, 15),
           ),
@@ -134,14 +134,14 @@ class _TeamScreenState extends State<TeamScreen> {
             // Gradient background
             Container(
               padding: const EdgeInsets.all(24),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFFE91E63),
-                    Color(0xFFAD1457),
-                    Color(0xFF7C4DFF),
+                    AppColors.primary,
+                    AppColors.primaryDark,
+                    AppColors.secondary,
                   ],
                 ),
               ),
@@ -191,8 +191,8 @@ class _TeamScreenState extends State<TeamScreen> {
                   ),
                   const Gap(16),
                   ShaderMask(
-                    shaderCallback: (bounds) => const LinearGradient(
-                      colors: [Colors.white, Color(0xFFFFE0E8)],
+                    shaderCallback: (bounds) => LinearGradient(
+                      colors: [Colors.white, AppColors.primaryLight],
                     ).createShader(bounds),
                     child: const Text(
                       'Invite & Earn',
@@ -315,7 +315,7 @@ class _TeamScreenState extends State<TeamScreen> {
             value: provider.totalReferrals > 0
                 ? '${((provider.activeReferrals / provider.totalReferrals) * 100).toStringAsFixed(0)}%'
                 : '0%',
-            color: const Color(0xFF448AFF),
+            color: AppColors.secondary,
           ),
         ),
       ],
@@ -556,13 +556,11 @@ class _TeamScreenState extends State<TeamScreen> {
           flex: 2,
           child: Container(
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFE91E63), Color(0xFFAD1457)],
-              ),
+              gradient: AppColors.primaryGradient,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFE91E63).withOpacity(0.4),
+                  color: AppColors.primary.withOpacity(0.4),
                   blurRadius: 15,
                   offset: const Offset(0, 5),
                 ),
@@ -622,11 +620,11 @@ class _TeamScreenState extends State<TeamScreen> {
             child: InkWell(
               onTap: () {},
               borderRadius: BorderRadius.circular(16),
-              child: const Padding(
-                padding: EdgeInsets.all(18),
+              child: Padding(
+                padding: const EdgeInsets.all(18),
                 child: Icon(
                   Icons.qr_code_rounded,
-                  color: Color(0xFF7C4DFF),
+                  color: AppColors.accent,
                   size: 24,
                 ),
               ),
@@ -646,13 +644,11 @@ class _TeamScreenState extends State<TeamScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF7C4DFF), Color(0xFF536DFE)],
-                ),
+                gradient: AppColors.accentGradient,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF7C4DFF).withOpacity(0.3),
+                    color: AppColors.accent.withOpacity(0.3),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -681,7 +677,7 @@ class _TeamScreenState extends State<TeamScreen> {
           title: 'Share Your Link',
           description: 'Send your referral link to friends',
           icon: Icons.share_rounded,
-          color: const Color(0xFFE91E63),
+          color: AppColors.primary,
         ),
         const Gap(14),
         _buildStep(
@@ -689,7 +685,7 @@ class _TeamScreenState extends State<TeamScreen> {
           title: 'Friends Sign Up',
           description: 'They register using your referral code',
           icon: Icons.person_add_rounded,
-          color: const Color(0xFF448AFF),
+          color: AppColors.secondary,
         ),
         const Gap(14),
         _buildStep(
@@ -697,7 +693,7 @@ class _TeamScreenState extends State<TeamScreen> {
           title: 'Both Earn Rewards',
           description: 'Get bonus when they complete 15 tasks',
           icon: Icons.celebration_rounded,
-          color: const Color(0xFFFFD700),
+          color: AppColors.accent,
         ),
       ],
     ).animate().fadeIn(delay: 500.ms, duration: 400.ms);
@@ -794,9 +790,7 @@ class _TeamScreenState extends State<TeamScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF00BCD4), Color(0xFF00ACC1)],
-                ),
+                gradient: AppColors.accentGradient,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(

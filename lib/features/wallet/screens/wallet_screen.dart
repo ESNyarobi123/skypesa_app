@@ -68,7 +68,7 @@ class _WalletScreenState extends State<WalletScreen> {
             borderRadius: BorderRadius.circular(28),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF1A237E).withOpacity(0.4),
+                color: AppColors.primary.withOpacity(0.4),
                 blurRadius: 30,
                 offset: const Offset(0, 15),
                 spreadRadius: -5,
@@ -87,16 +87,16 @@ class _WalletScreenState extends State<WalletScreen> {
                 // Background gradient
                 Container(
                   padding: const EdgeInsets.all(24),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Color(0xFF1A237E),
-                        Color(0xFF00695C),
-                        Color(0xFF004D40),
+                        AppColors.primaryDark,
+                        AppColors.secondaryDark,
+                        const Color(0xFF004D40),
                       ],
-                      stops: [0.0, 0.5, 1.0],
+                      stops: const [0.0, 0.5, 1.0],
                     ),
                   ),
                 ),
@@ -223,13 +223,11 @@ class _WalletScreenState extends State<WalletScreen> {
                               vertical: 8,
                             ),
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFFFD700), Color(0xFFFFA000)],
-                              ),
+                              gradient: AppColors.primaryGradient,
                               borderRadius: BorderRadius.circular(20),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.accent.withOpacity(0.4),
+                                  color: AppColors.primary.withOpacity(0.4),
                                   blurRadius: 12,
                                   offset: const Offset(0, 4),
                                 ),
@@ -332,7 +330,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                 Navigator.pushNamed(context, '/withdraw'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
-                              foregroundColor: const Color(0xFF1A237E),
+                              foregroundColor: AppColors.primaryDark,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
@@ -390,10 +388,10 @@ class _WalletScreenState extends State<WalletScreen> {
             'Withdrawn',
             'TZS ${provider.totalWithdrawn.toStringAsFixed(0)}',
             Icons.account_balance_rounded,
-            const Color(0xFF448AFF),
+            AppColors.secondary,
             [
-              const Color(0xFF448AFF).withOpacity(0.2),
-              const Color(0xFF2962FF).withOpacity(0.05),
+              AppColors.secondary.withOpacity(0.2),
+              AppColors.secondaryDark.withOpacity(0.05),
             ],
           ),
         ),
@@ -477,7 +475,7 @@ class _WalletScreenState extends State<WalletScreen> {
           child: _buildActionButton(
             icon: Icons.history_rounded,
             label: 'Withdrawals',
-            color: const Color(0xFF7C4DFF),
+            color: AppColors.accent,
             onTap: () => Navigator.pushNamed(context, '/withdrawal-history'),
           ),
         ),
@@ -486,7 +484,7 @@ class _WalletScreenState extends State<WalletScreen> {
           child: _buildActionButton(
             icon: Icons.pending_actions_rounded,
             label: 'Pending',
-            color: const Color(0xFFFFAB40),
+            color: AppColors.warning,
             onTap: () => Navigator.pushNamed(context, '/withdrawal-history'),
           ),
         ),
@@ -495,7 +493,7 @@ class _WalletScreenState extends State<WalletScreen> {
           child: _buildActionButton(
             icon: Icons.analytics_rounded,
             label: 'Analytics',
-            color: const Color(0xFF00BCD4),
+            color: AppColors.secondary,
             onTap: () {},
           ),
         ),
@@ -504,7 +502,7 @@ class _WalletScreenState extends State<WalletScreen> {
           child: _buildActionButton(
             icon: Icons.help_outline_rounded,
             label: 'Help',
-            color: const Color(0xFF448AFF),
+            color: AppColors.tertiary,
             onTap: () => Navigator.pushNamed(context, '/support'),
           ),
         ),

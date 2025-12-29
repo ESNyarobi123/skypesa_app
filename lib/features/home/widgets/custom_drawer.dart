@@ -83,8 +83,8 @@ class CustomDrawer extends StatelessWidget {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              const Color(0xFF1A237E).withOpacity(0.6),
-                              const Color(0xFF00695C).withOpacity(0.4),
+                              AppColors.primaryDark.withOpacity(0.6),
+                              AppColors.secondaryDark.withOpacity(0.4),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(24),
@@ -303,7 +303,7 @@ class CustomDrawer extends StatelessWidget {
                           icon: Icons.person_outline_rounded,
                           label: 'My Profile',
                           subtitle: 'View & edit your info',
-                          color: const Color(0xFF7C4DFF),
+                          color: AppColors.accent,
                           onTap: () {
                             Navigator.pop(context);
                             Navigator.pushNamed(context, '/profile');
@@ -314,7 +314,7 @@ class CustomDrawer extends StatelessWidget {
                           icon: Icons.workspace_premium_rounded,
                           label: 'Subscription Plans',
                           subtitle: 'Upgrade for more earnings',
-                          color: const Color(0xFFFFD700),
+                          color: AppColors.primary,
                           isHighlighted: true,
                           onTap: () {
                             Navigator.pop(context);
@@ -343,7 +343,7 @@ class CustomDrawer extends StatelessWidget {
                           icon: Icons.payments_rounded,
                           label: 'Withdraw Funds',
                           subtitle: 'Cash out your earnings',
-                          color: const Color(0xFF448AFF),
+                          color: AppColors.secondary,
                           onTap: () {
                             Navigator.pop(context);
                             Navigator.pushNamed(context, '/withdraw');
@@ -354,7 +354,7 @@ class CustomDrawer extends StatelessWidget {
                           icon: Icons.history_rounded,
                           label: 'Transaction History',
                           subtitle: 'View all transactions',
-                          color: const Color(0xFF00BCD4),
+                          color: AppColors.accent,
                           onTap: () {
                             Navigator.pop(context);
                           },
@@ -370,7 +370,7 @@ class CustomDrawer extends StatelessWidget {
                           icon: Icons.share_rounded,
                           label: 'Invite Friends',
                           subtitle: 'Earn bonuses for referrals',
-                          color: const Color(0xFFE91E63),
+                          color: AppColors.primary,
                           onTap: () {
                             Navigator.pop(context);
                           },
@@ -380,7 +380,7 @@ class CustomDrawer extends StatelessWidget {
                           icon: Icons.emoji_events_rounded,
                           label: 'Leaderboard',
                           subtitle: 'See top earners',
-                          color: const Color(0xFFFFA726),
+                          color: AppColors.primaryLight,
                           onTap: () {
                             Navigator.pop(context);
                           },
@@ -396,7 +396,7 @@ class CustomDrawer extends StatelessWidget {
                           icon: Icons.headset_mic_rounded,
                           label: 'Help Center',
                           subtitle: 'Get support',
-                          color: const Color(0xFF26A69A),
+                          color: AppColors.tertiary,
                           onTap: () {
                             Navigator.pop(context);
                             Navigator.pushNamed(context, '/support');
@@ -407,7 +407,7 @@ class CustomDrawer extends StatelessWidget {
                           icon: Icons.help_outline_rounded,
                           label: 'FAQ',
                           subtitle: 'Common questions',
-                          color: const Color(0xFF78909C),
+                          color: AppColors.secondary,
                           onTap: () {
                             Navigator.pop(context);
                             _showFAQDialog(context);
@@ -418,7 +418,7 @@ class CustomDrawer extends StatelessWidget {
                           icon: Icons.info_outline_rounded,
                           label: 'About SKYpesa',
                           subtitle: 'App information',
-                          color: const Color(0xFF9575CD),
+                          color: AppColors.accent,
                           onTap: () {
                             Navigator.pop(context);
                             _showAboutDialog(context);
@@ -601,7 +601,7 @@ class CustomDrawer extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [const Color(0xFF448AFF), const Color(0xFF2962FF)],
+                  colors: [AppColors.secondary, AppColors.secondaryDark],
                 ),
                 borderRadius: BorderRadius.circular(14),
               ),

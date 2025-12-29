@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/api_constants.dart';
 import '../../../models/user_model.dart';
+import '../../../models/blocked_info_model.dart';
 
 class AuthService {
   final Dio _dio = Dio();
@@ -246,6 +247,68 @@ class AuthService {
     } catch (e) {
       developer.log('Get profile error: $e');
       return null;
+    }
+  }
+
+  /// Check if the current user is blocked
+  /// Returns BlockedInfo with is_blocked status and details
+  Future<BlockedInfo> checkBlockedStatus() async {
+    try {
+      developer.log('=== Checking blocked status ===');
+
+      final response = await _dio.get(ApiConstants.blockedInfo);
+
+      developer.log('Blocked info response status: ${response.statusCode}');
+      developer.log('Blocked info response data: ${response.data}');
+      developer.log('Response data type: ${response.data.runtimeType}');
+
+      if (response.data == null) {
+        developer.log('ERROR: Response data is null');
+        return BlockedInfo(isBlocked: false, message: 'No data from server');
+      }
+
+      final data = response.data as Map<String, dynamic>;
+
+      // Debug: print all keys
+      developer.log('Response keys: ${data.keys.toList()}');
+      developer.log('is_blocked value: ${data['is_blocked']}');
+      developer.log('is_blocked type: ${data['is_blocked'].runtimeType}');
+
+      final blockedInfo = BlockedInfo.fromJson(data);
+      developer.log('=== Parsed BlockedInfo ===');
+      developer.log('isBlocked: ${blockedInfo.isBlocked}');
+      developer.log('blockedReason: ${blockedInfo.blockedReason}');
+      developer.log('blockedAt: ${blockedInfo.blockedAt}');
+
+      return blockedInfo;
+    } on DioException catch (e) {
+      developer.log('DioException checking blocked status: ${e.message}');
+      developer.log('DioException status code: ${e.response?.statusCode}');
+      developer.log('DioException response data: ${e.response?.data}');
+
+      // If 403 Forbidden, user might be blocked
+      if (e.response?.statusCode == 403) {
+        final data = e.response?.data;
+        developer.log('Got 403 - checking if blocked response');
+        if (data is Map<String, dynamic>) {
+          developer.log('403 response keys: ${data.keys.toList()}');
+          final blockedInfo = BlockedInfo.fromJson(data);
+          developer.log('403 isBlocked: ${blockedInfo.isBlocked}');
+          return blockedInfo;
+        }
+      }
+
+      // Return not blocked by default on error
+      return BlockedInfo(
+        isBlocked: false,
+        message: 'Could not check status: ${e.message}',
+      );
+    } catch (e) {
+      developer.log('General error checking blocked status: $e');
+      return BlockedInfo(
+        isBlocked: false,
+        message: 'Could not check status: $e',
+      );
     }
   }
 

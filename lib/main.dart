@@ -7,6 +7,8 @@ import 'features/auth/screens/login_screen.dart';
 import 'features/auth/screens/register_screen.dart';
 import 'features/auth/screens/splash_screen.dart';
 import 'features/auth/screens/forgot_password_screen.dart';
+import 'features/auth/screens/blocked_screen.dart';
+import 'models/blocked_info_model.dart';
 import 'features/home/screens/main_screen.dart';
 import 'features/home/providers/dashboard_provider.dart';
 import 'features/profile/screens/profile_screen.dart';
@@ -82,6 +84,36 @@ class MyApp extends StatelessWidget {
           return MaterialPageRoute(
             builder: (context) =>
                 TicketDetailScreen(ticketNumber: ticketNumber),
+          );
+        }
+        if (settings.name == '/blocked') {
+          final blockedInfo = settings.arguments as BlockedInfo;
+          return MaterialPageRoute(
+            builder: (context) => BlockedScreen(
+              blockedInfo: blockedInfo,
+              onRefresh: () async {
+                final authProvider = Provider.of<AuthProvider>(
+                  context,
+                  listen: false,
+                );
+                final newInfo = await authProvider.checkBlockedStatus();
+                if (!newInfo.isBlocked) {
+                  Navigator.pushReplacementNamed(context, '/dashboard');
+                }
+              },
+              onLogout: () {
+                final authProvider = Provider.of<AuthProvider>(
+                  context,
+                  listen: false,
+                );
+                authProvider.logout();
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/login',
+                  (route) => false,
+                );
+              },
+            ),
           );
         }
         return null;

@@ -29,12 +29,32 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
-      final success = await context.read<AuthProvider>().login(
+      final authProvider = context.read<AuthProvider>();
+      final success = await authProvider.login(
         _emailController.text.trim(),
         _passwordController.text,
       );
 
+      debugPrint('=== LOGIN RESULT ===');
+      debugPrint('Success: $success');
+      debugPrint('isBlocked: ${authProvider.isBlocked}');
+      debugPrint('blockedInfo: ${authProvider.blockedInfo}');
+      debugPrint(
+        'blockedInfo.isBlocked: ${authProvider.blockedInfo?.isBlocked}',
+      );
+
       if (success && mounted) {
+        // Check if user is blocked
+        if (authProvider.isBlocked && authProvider.blockedInfo != null) {
+          debugPrint('>>> LOGIN: Redirecting to BLOCKED screen');
+          Navigator.pushReplacementNamed(
+            context,
+            '/blocked',
+            arguments: authProvider.blockedInfo,
+          );
+          return;
+        }
+
         // Show success message first
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -58,11 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 const Icon(Icons.error_outline_rounded, color: Colors.white),
                 const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    context.read<AuthProvider>().error ?? 'Login failed',
-                  ),
-                ),
+                Expanded(child: Text(authProvider.error ?? 'Login failed')),
               ],
             ),
             backgroundColor: AppColors.error,

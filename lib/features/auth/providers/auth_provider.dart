@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../models/user_model.dart';
+import '../../../models/blocked_info_model.dart';
 import '../services/auth_service.dart';
 
 class AuthProvider with ChangeNotifier {
@@ -8,12 +9,15 @@ class AuthProvider with ChangeNotifier {
   bool _isLoading = false;
   String? _error;
   String? _successMessage;
+  BlockedInfo? _blockedInfo;
 
   User? get user => _user;
   bool get isLoading => _isLoading;
   String? get error => _error;
   String? get successMessage => _successMessage;
   bool get isAuthenticated => _user != null;
+  BlockedInfo? get blockedInfo => _blockedInfo;
+  bool get isBlocked => _blockedInfo?.isBlocked ?? false;
 
   Future<bool> login(String email, String password) async {
     _setLoading(true);
@@ -21,6 +25,10 @@ class AuthProvider with ChangeNotifier {
       final data = await _authService.login(email, password);
       _user = data['user'];
       _error = null;
+
+      // Check if user is blocked after login
+      await checkBlockedStatus();
+
       notifyListeners();
       return true;
     } catch (e) {
@@ -67,6 +75,7 @@ class AuthProvider with ChangeNotifier {
   Future<void> logout() async {
     await _authService.logout();
     _user = null;
+    _blockedInfo = null;
     notifyListeners();
   }
 
@@ -76,6 +85,8 @@ class AuthProvider with ChangeNotifier {
       final user = await _authService.getUserProfile();
       if (user != null) {
         _user = user;
+        // Also check blocked status when checking auth
+        await checkBlockedStatus();
       }
     } catch (e) {
       // Token might be invalid or expired
@@ -83,6 +94,34 @@ class AuthProvider with ChangeNotifier {
     } finally {
       _setLoading(false);
     }
+  }
+
+  /// Check if user is blocked
+  /// This can be called periodically or after specific actions
+  Future<BlockedInfo> checkBlockedStatus() async {
+    try {
+      debugPrint('AuthProvider: Starting blocked status check...');
+      _blockedInfo = await _authService.checkBlockedStatus();
+      debugPrint(
+        'AuthProvider: Blocked status result - isBlocked: ${_blockedInfo?.isBlocked}',
+      );
+      debugPrint(
+        'AuthProvider: Blocked reason: ${_blockedInfo?.blockedReason}',
+      );
+      notifyListeners();
+      return _blockedInfo!;
+    } catch (e) {
+      debugPrint('AuthProvider: Error checking blocked status: $e');
+      _blockedInfo = BlockedInfo(isBlocked: false);
+      notifyListeners();
+      return _blockedInfo!;
+    }
+  }
+
+  /// Clear blocked info (useful when user gets unblocked)
+  void clearBlockedInfo() {
+    _blockedInfo = null;
+    notifyListeners();
   }
 
   void _setLoading(bool value) {

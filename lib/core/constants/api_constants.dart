@@ -14,6 +14,7 @@ class ApiConstants {
   static const String dashboard = '/user/dashboard';
   static const String updateAvatar = '/user/avatar';
   static const String changePassword = '/user/password';
+  static const String blockedInfo = '/user/blocked-info';
 
   // Tasks
   static const String tasks = '/tasks';
