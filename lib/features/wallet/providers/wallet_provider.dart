@@ -9,6 +9,7 @@ class WalletProvider with ChangeNotifier {
   double _balance = 0.0;
   double _totalEarned = 0.0;
   double _totalWithdrawn = 0.0;
+  double _todayEarned = 0.0;
   int _pendingWithdrawals = 0;
   bool _isLoading = false;
   String? _error;
@@ -17,6 +18,7 @@ class WalletProvider with ChangeNotifier {
   double get balance => _balance;
   double get totalEarned => _totalEarned;
   double get totalWithdrawn => _totalWithdrawn;
+  double get todayEarned => _todayEarned;
   int get pendingWithdrawals => _pendingWithdrawals;
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -44,6 +46,7 @@ class WalletProvider with ChangeNotifier {
         _balance = _parseDouble(walletData['balance']);
         _totalEarned = _parseDouble(walletData['total_earned']);
         _totalWithdrawn = _parseDouble(walletData['total_withdrawn']);
+        _todayEarned = _parseDouble(walletData['today_earned']);
         _pendingWithdrawals = walletData['pending_withdrawals'] ?? 0;
       }
 

@@ -1,24 +1,33 @@
 import 'package:flutter/material.dart';
-import '../../../models/plan_model.dart';
 import '../services/plan_service.dart';
 
 class PlanProvider with ChangeNotifier {
   final PlanService _planService = PlanService();
   List<Plan> _plans = [];
-  Plan? _currentPlan;
+  CurrentSubscription? _subscription;
   bool _isLoading = false;
   String? _error;
 
   List<Plan> get plans => _plans;
-  Plan? get currentPlan => _currentPlan;
+  CurrentSubscription? get subscription => _subscription;
+  Plan? get currentPlan => _subscription?.data != null
+      ? _plans.firstWhere(
+          (p) => p.slug == _subscription?.data?.plan.slug,
+          orElse: () => _plans.isNotEmpty ? _plans.first : Plan.empty(),
+        )
+      : null;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
   Future<void> fetchPlans() async {
     _setLoading(true);
     try {
-      _plans = await _planService.getPlans();
-      _currentPlan = await _planService.getCurrentSubscription();
+      final results = await Future.wait([
+        _planService.getPlans(),
+        _planService.getCurrentSubscription(),
+      ]);
+      _plans = results[0] as List<Plan>;
+      _subscription = results[1] as CurrentSubscription?;
       _error = null;
     } catch (e) {
       _error = e.toString();
@@ -27,33 +36,20 @@ class PlanProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> subscribe(int planId) async {
+  Future<PaymentResult> initiatePayment(int planId, String phoneNumber) async {
     _setLoading(true);
     try {
-      await _planService.subscribe(planId);
-      await fetchPlans(); // Refresh current plan
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-      return false;
-    } finally {
+      final result = await _planService.initiatePayment(planId, phoneNumber);
       _setLoading(false);
+      return result;
+    } catch (e) {
+      _setLoading(false);
+      return PaymentResult(success: false, message: e.toString());
     }
   }
 
-  Future<bool> paySubscription(int planId, String phoneNumber) async {
-    _setLoading(true);
-    try {
-      await _planService.paySubscription(planId, phoneNumber);
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-      return false;
-    } finally {
-      _setLoading(false);
-    }
+  Future<PaymentStatus> checkPaymentStatus(String orderId) async {
+    return await _planService.checkPaymentStatus(orderId);
   }
 
   void _setLoading(bool value) {

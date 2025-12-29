@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/widgets/glass_container.dart';
 import '../../../models/task_model.dart';
 
 class TaskCard extends StatelessWidget {
@@ -39,6 +38,10 @@ class TaskCard extends StatelessWidget {
         return Icons.touch_app_rounded;
       case 'tv':
         return Icons.tv_rounded;
+      case 'video':
+        return Icons.videocam_rounded;
+      case 'ad':
+        return Icons.campaign_rounded;
       default:
         return task.isFeatured ? Icons.star_rounded : Icons.play_circle_rounded;
     }
@@ -50,167 +53,246 @@ class TaskCard extends StatelessWidget {
 
     return InkWell(
           onTap: canComplete ? onTap : null,
-          borderRadius: BorderRadius.circular(16),
-          child: Opacity(
+          borderRadius: BorderRadius.circular(20),
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 200),
             opacity: canComplete ? 1.0 : 0.5,
-            child: GlassContainer(
-              padding: const EdgeInsets.all(16),
+            child: Container(
               margin: const EdgeInsets.only(bottom: 12),
-              border: Border.all(
-                color: task.isFeatured
-                    ? AppColors.accent.withOpacity(0.5)
-                    : Colors.white.withOpacity(0.1),
-              ),
-              gradientColors: task.isFeatured
-                  ? [
-                      AppColors.accent.withOpacity(0.12),
-                      AppColors.accent.withOpacity(0.04),
-                    ]
-                  : null,
-              child: Row(
-                children: [
-                  // Task Icon
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      gradient: task.isFeatured
-                          ? AppColors.premiumGradient
-                          : LinearGradient(
-                              colors: [
-                                AppColors.primary.withOpacity(0.3),
-                                AppColors.primaryDark.withOpacity(0.2),
-                              ],
-                            ),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(
-                      _getIconForTask(),
-                      color: Colors.white,
-                      size: 24,
-                    ),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: task.isFeatured
+                      ? [
+                          AppColors.accent.withOpacity(0.15),
+                          AppColors.accent.withOpacity(0.05),
+                        ]
+                      : [AppColors.card, AppColors.surface.withOpacity(0.5)],
+                ),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: task.isFeatured
+                      ? AppColors.accent.withOpacity(0.4)
+                      : AppColors.surface,
+                  width: task.isFeatured ? 2 : 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: task.isFeatured
+                        ? AppColors.accent.withOpacity(0.15)
+                        : Colors.black.withOpacity(0.1),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
                   ),
-                  const Gap(14),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    // Task Icon with gradient background
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        gradient: task.isFeatured
+                            ? AppColors.premiumGradient
+                            : AppColors.primaryGradient,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                (task.isFeatured
+                                        ? AppColors.accent
+                                        : AppColors.primary)
+                                    .withOpacity(0.4),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        _getIconForTask(),
+                        color: Colors.white,
+                        size: 26,
+                      ),
+                    ),
+                    const Gap(14),
 
-                  // Task Info
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
+                    // Task Info
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Title Row with badges
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  task.title,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              if (task.isFeatured)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    gradient: AppColors.premiumGradient,
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.accent.withOpacity(
+                                          0.4,
+                                        ),
+                                        blurRadius: 8,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: const [
+                                      Icon(
+                                        Icons.local_fire_department_rounded,
+                                        color: Colors.white,
+                                        size: 12,
+                                      ),
+                                      Gap(4),
+                                      Text(
+                                        'HOT',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          ),
+                          const Gap(8),
+
+                          // Description if available
+                          if (task.description.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
                               child: Text(
-                                task.title,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
+                                task.description,
+                                style: TextStyle(
+                                  color: AppColors.textSecondary,
+                                  fontSize: 12,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            if (task.isFeatured)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  gradient: AppColors.premiumGradient,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Text(
-                                  'HOT',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                        const Gap(6),
-                        Row(
-                          children: [
-                            // Duration
-                            Icon(
-                              Icons.timer_outlined,
-                              size: 14,
-                              color: AppColors.textSecondary,
-                            ),
-                            const Gap(4),
-                            Text(
-                              '${task.durationSeconds}s',
-                              style: const TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 12,
-                              ),
-                            ),
-                            const Gap(12),
 
-                            // Remaining
-                            Icon(
-                              Icons.repeat_rounded,
-                              size: 14,
-                              color: task.remaining > 0
-                                  ? AppColors.primary
-                                  : AppColors.error,
-                            ),
-                            const Gap(4),
-                            Text(
-                              '${task.remaining} left',
-                              style: TextStyle(
-                                color: task.remaining > 0
-                                    ? AppColors.textSecondary
-                                    : AppColors.error,
-                                fontSize: 12,
+                          // Stats Row
+                          Row(
+                            children: [
+                              // Duration
+                              _buildStatBadge(
+                                icon: Icons.timer_outlined,
+                                label: '${task.durationSeconds}s',
+                                color: AppColors.info,
                               ),
+                              const Gap(10),
+
+                              // Remaining
+                              _buildStatBadge(
+                                icon: Icons.repeat_rounded,
+                                label: '${task.remaining} imebaki',
+                                color: task.remaining > 0
+                                    ? AppColors.primary
+                                    : AppColors.error,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const Gap(12),
+
+                    // Reward & Action
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        // Reward Badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                AppColors.success.withOpacity(0.2),
+                                AppColors.success.withOpacity(0.1),
+                              ],
                             ),
-                          ],
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColors.success.withOpacity(0.3),
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                '+TZS',
+                                style: TextStyle(
+                                  color: AppColors.success.withOpacity(0.8),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                task.reward.toStringAsFixed(0),
+                                style: const TextStyle(
+                                  color: AppColors.success,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Gap(8),
+
+                        // Action indicator
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: canComplete
+                                ? AppColors.primary.withOpacity(0.15)
+                                : AppColors.surface,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            canComplete
+                                ? Icons.arrow_forward_rounded
+                                : Icons.lock_rounded,
+                            color: canComplete
+                                ? AppColors.primary
+                                : AppColors.textTertiary,
+                            size: 18,
+                          ),
                         ),
                       ],
                     ),
-                  ),
-
-                  // Reward
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.success.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppColors.success.withOpacity(0.3),
-                          ),
-                        ),
-                        child: Text(
-                          '+TZS ${task.reward.toStringAsFixed(0)}',
-                          style: const TextStyle(
-                            color: AppColors.success,
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const Gap(6),
-                      Icon(
-                        Icons.chevron_right_rounded,
-                        color: canComplete
-                            ? AppColors.textSecondary
-                            : AppColors.textTertiary,
-                        size: 20,
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -218,5 +300,34 @@ class TaskCard extends StatelessWidget {
         .animate()
         .fadeIn(delay: (50 * index).ms, duration: 400.ms)
         .slideX(begin: 0.05, end: 0);
+  }
+
+  Widget _buildStatBadge({
+    required IconData icon,
+    required String label,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          const Gap(4),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

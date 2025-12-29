@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../models/task_model.dart';
 import '../services/task_service.dart';
@@ -13,6 +14,10 @@ class TaskProvider with ChangeNotifier {
   bool _isLoading = false;
   String? _error;
 
+  // Cooldown timer
+  int _cooldownSeconds = 0;
+  Timer? _cooldownTimer;
+
   List<Task> get tasks => _tasks;
   Map<String, dynamic>? get stats => _stats;
   Map<String, dynamic>? get planInfo => _planInfo;
@@ -20,6 +25,8 @@ class TaskProvider with ChangeNotifier {
   int? get activeTaskId => _activeTaskId;
   bool get isLoading => _isLoading;
   String? get error => _error;
+  int get cooldownSeconds => _cooldownSeconds;
+  bool get isOnCooldown => _cooldownSeconds > 0;
 
   // Convenience getters from stats
   int get completedToday => _stats?['completed_today'] ?? 0;
@@ -74,6 +81,10 @@ class TaskProvider with ChangeNotifier {
       );
       _currentLockToken = null;
       _activeTaskId = null;
+
+      // Start cooldown timer (e.g., 15 seconds between tasks)
+      startCooldown(15);
+
       // Refresh tasks list
       await fetchTasks();
       return result;
@@ -82,6 +93,29 @@ class TaskProvider with ChangeNotifier {
       notifyListeners();
       rethrow;
     }
+  }
+
+  void startCooldown(int seconds) {
+    _cooldownTimer?.cancel();
+    _cooldownSeconds = seconds;
+    notifyListeners();
+
+    _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_cooldownSeconds > 0) {
+        _cooldownSeconds--;
+        notifyListeners();
+      } else {
+        timer.cancel();
+        _cooldownTimer = null;
+      }
+    });
+  }
+
+  void cancelCooldown() {
+    _cooldownTimer?.cancel();
+    _cooldownTimer = null;
+    _cooldownSeconds = 0;
+    notifyListeners();
   }
 
   Future<void> cancelTask() async {
@@ -94,5 +128,11 @@ class TaskProvider with ChangeNotifier {
   void clearError() {
     _error = null;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _cooldownTimer?.cancel();
+    super.dispose();
   }
 }

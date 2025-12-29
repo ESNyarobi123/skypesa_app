@@ -11,6 +11,7 @@ import 'features/home/screens/main_screen.dart';
 import 'features/home/providers/dashboard_provider.dart';
 import 'features/profile/screens/profile_screen.dart';
 import 'features/support/screens/support_screen.dart';
+import 'features/support/screens/ticket_detail_screen.dart';
 import 'features/leaderboard/providers/leaderboard_provider.dart';
 
 import 'features/tasks/providers/task_provider.dart';
@@ -19,6 +20,7 @@ import 'models/task_model.dart';
 
 import 'features/wallet/providers/wallet_provider.dart';
 import 'features/wallet/screens/withdraw_screen.dart';
+import 'features/wallet/screens/withdrawal_history_screen.dart';
 
 import 'features/plans/providers/plan_provider.dart';
 import 'features/plans/screens/plans_screen.dart';
@@ -74,6 +76,13 @@ class MyApp extends StatelessWidget {
             builder: (context) => TaskExecutionScreen(task: task),
           );
         }
+        if (settings.name == '/ticket-detail') {
+          final ticketNumber = settings.arguments as String;
+          return MaterialPageRoute(
+            builder: (context) =>
+                TicketDetailScreen(ticketNumber: ticketNumber),
+          );
+        }
         return null;
       },
       routes: {
@@ -82,6 +91,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => const RegisterScreen(),
         '/dashboard': (context) => const MainScreen(),
         '/withdraw': (context) => const WithdrawScreen(),
+        '/withdrawal-history': (context) => const WithdrawalHistoryScreen(),
         '/plans': (context) => const PlansScreen(),
         '/forgot-password': (context) => const ForgotPasswordScreen(),
         '/support': (context) => const SupportScreen(),
