@@ -312,6 +312,121 @@ class AuthService {
     }
   }
 
+  /// Request password reset OTP
+  /// Sends OTP to user's email address
+  Future<Map<String, dynamic>> forgotPassword(String email) async {
+    try {
+      developer.log('Requesting password reset for: $email');
+
+      final response = await _dio.post(
+        ApiConstants.forgotPassword,
+        data: {'email': email},
+      );
+
+      developer.log('Forgot password response: ${response.data}');
+
+      if (response.data is Map<String, dynamic>) {
+        return {
+          'success': response.data['success'] ?? true,
+          'message':
+              response.data['message'] ??
+              'Maelekezo ya kubadilisha password yametumwa kwenye email yako',
+        };
+      }
+
+      return {
+        'success': true,
+        'message':
+            'Maelekezo ya kubadilisha password yametumwa kwenye email yako',
+      };
+    } on DioException catch (e) {
+      developer.log('Forgot password error: ${e.response?.data}');
+
+      if (e.response?.statusCode == 422) {
+        final data = e.response?.data;
+        if (data is Map) {
+          final errors = data['errors'];
+          if (errors is Map && errors.containsKey('email')) {
+            throw 'Email haipatikani';
+          }
+          throw data['message'] ?? 'Email haipatikani';
+        }
+      }
+
+      throw _handleError(e);
+    }
+  }
+
+  /// Reset password using OTP
+  /// Verifies OTP and sets new password
+  Future<Map<String, dynamic>> resetPassword({
+    required String email,
+    required String token,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    try {
+      developer.log('Resetting password for: $email');
+
+      final response = await _dio.post(
+        ApiConstants.resetPassword,
+        data: {
+          'email': email,
+          'token': token,
+          'password': password,
+          'password_confirmation': passwordConfirmation,
+        },
+      );
+
+      developer.log('Reset password response: ${response.data}');
+
+      if (response.data is Map<String, dynamic>) {
+        return {
+          'success': response.data['success'] ?? true,
+          'message':
+              response.data['message'] ?? 'Password imebadilishwa. Ingia sasa.',
+        };
+      }
+
+      return {
+        'success': true,
+        'message': 'Password imebadilishwa. Ingia sasa.',
+      };
+    } on DioException catch (e) {
+      developer.log('Reset password error: ${e.response?.data}');
+
+      if (e.response?.statusCode == 400) {
+        final data = e.response?.data;
+        if (data is Map) {
+          throw data['message'] ??
+              'Kodi ya uhakiki si sahihi au imeisha muda wake';
+        }
+        throw 'Kodi ya uhakiki si sahihi au imeisha muda wake';
+      }
+
+      if (e.response?.statusCode == 422) {
+        final data = e.response?.data;
+        if (data is Map) {
+          final errors = data['errors'];
+          if (errors is Map) {
+            if (errors.containsKey('token')) {
+              throw 'Kodi ya uhakiki si sahihi';
+            }
+            if (errors.containsKey('password')) {
+              throw 'Password lazima iwe na angalau herufi 6';
+            }
+            if (errors.containsKey('email')) {
+              throw 'Email haipatikani';
+            }
+          }
+          throw data['message'] ?? 'Tafadhali angalia taarifa ulizojaza';
+        }
+      }
+
+      throw _handleError(e);
+    }
+  }
+
   String _handleError(DioException e) {
     developer.log('Handling DioException: ${e.type}');
 

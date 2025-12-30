@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
+import 'core/services/firebase_notification_service.dart';
 import 'features/auth/providers/auth_provider.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/auth/screens/register_screen.dart';
@@ -32,8 +33,21 @@ import 'features/team/providers/team_provider.dart';
 
 import 'features/profile/providers/user_provider.dart';
 
-void main() {
+// Global key for navigation from notification handlers
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase Notification Service
+  final notificationService = FirebaseNotificationService();
+  await notificationService.initialize();
+
+  // Save FCM token for sending to backend
+  await notificationService.saveToken();
+
+  // Subscribe to general announcements topic
+  await notificationService.subscribeToTopic('announcements');
 
   // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
@@ -57,17 +71,57 @@ void main() {
         ChangeNotifierProvider(create: (_) => DashboardProvider()),
         ChangeNotifierProvider(create: (_) => LeaderboardProvider()),
       ],
-      child: const MyApp(),
+      child: MyApp(notificationService: notificationService),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  final FirebaseNotificationService notificationService;
+
+  const MyApp({super.key, required this.notificationService});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    _setupNotificationListeners();
+  }
+
+  void _setupNotificationListeners() {
+    // Listen for notification taps
+    widget.notificationService.onNotificationTap.listen((message) {
+      _handleNotificationNavigation(message.data);
+    });
+  }
+
+  void _handleNotificationNavigation(Map<String, dynamic> data) {
+    // Navigate based on notification data
+    final type = data['type'] as String?;
+
+    switch (type) {
+      case 'withdrawal':
+        navigatorKey.currentState?.pushNamed('/withdrawal-history');
+        break;
+      case 'task':
+        navigatorKey.currentState?.pushNamed('/dashboard');
+        break;
+      case 'announcement':
+        navigatorKey.currentState?.pushNamed('/notifications');
+        break;
+      default:
+        navigatorKey.currentState?.pushNamed('/notifications');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'SKYpesa',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,

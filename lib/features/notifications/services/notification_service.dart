@@ -118,6 +118,83 @@ class NotificationService {
       return false;
     }
   }
+
+  /// Register FCM token to database
+  Future<bool> registerFcmToken({
+    required String fcmToken,
+    String deviceType = 'android',
+  }) async {
+    try {
+      final response = await _dio.post(
+        ApiConstants.fcmToken,
+        data: {'fcm_token': fcmToken, 'device_type': deviceType},
+      );
+      if (response.data['success'] == true) {
+        developer.log('FCM token registered successfully');
+        return true;
+      }
+      return false;
+    } catch (e) {
+      developer.log('Error registering FCM token: $e');
+      return false;
+    }
+  }
+
+  /// Clear all notifications
+  Future<ClearResult> clearAllNotifications() async {
+    try {
+      final response = await _dio.delete(ApiConstants.notificationsClearAll);
+      if (response.data['success'] == true) {
+        final data = response.data['data'] ?? {};
+        return ClearResult(
+          success: true,
+          deletedCount: data['deleted_count'] ?? 0,
+          message: response.data['message'] ?? 'Arifa zimefutwa.',
+        );
+      }
+      return ClearResult(
+        success: false,
+        deletedCount: 0,
+        message: 'Imeshindwa kufuta arifa.',
+      );
+    } catch (e) {
+      developer.log('Error clearing notifications: $e');
+      return ClearResult(
+        success: false,
+        deletedCount: 0,
+        message: 'Hitilafu imetokea.',
+      );
+    }
+  }
+
+  /// Get notification types with counts
+  Future<List<NotificationType>> getNotificationTypes() async {
+    try {
+      final response = await _dio.get(ApiConstants.notificationsTypes);
+      if (response.data['success'] == true && response.data['data'] != null) {
+        final dataList = response.data['data'] as List;
+        return dataList.map((t) => NotificationType.fromJson(t)).toList();
+      }
+      return [];
+    } catch (e) {
+      developer.log('Error fetching notification types: $e');
+      return [];
+    }
+  }
+
+  /// Get single notification by ID
+  Future<AppNotification?> getNotification(String id) async {
+    try {
+      final response = await _dio.get(ApiConstants.notificationDetail(id));
+      if (response.data['success'] == true && response.data['data'] != null) {
+        return AppNotification.fromJson(response.data['data']);
+      }
+      return null;
+    } catch (e) {
+      developer.log('Error fetching notification: $e');
+      return null;
+    }
+  }
 }
 
 // ================== DATA MODELS ==================
@@ -320,4 +397,41 @@ class Announcement {
     createdAt: json['created_at']?.toString() ?? '',
     createdAtHuman: json['created_at_human']?.toString() ?? '',
   );
+}
+
+class ClearResult {
+  final bool success;
+  final int deletedCount;
+  final String message;
+
+  ClearResult({
+    required this.success,
+    required this.deletedCount,
+    required this.message,
+  });
+}
+
+class NotificationType {
+  final String type;
+  final String label;
+  final String icon;
+  final String color;
+  final int count;
+
+  NotificationType({
+    required this.type,
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.count,
+  });
+
+  factory NotificationType.fromJson(Map<String, dynamic> json) =>
+      NotificationType(
+        type: json['type']?.toString() ?? '',
+        label: json['label']?.toString() ?? '',
+        icon: json['icon']?.toString() ?? 'bell',
+        color: json['color']?.toString() ?? '#6b7280',
+        count: json['count'] ?? 0,
+      );
 }

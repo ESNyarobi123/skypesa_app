@@ -56,4 +56,16 @@ class ApiConstants {
   static const String supportFaq = '/support/faq';
   static const String supportTickets = '/support/tickets';
   static const String bugReport = '/support/bug-report';
+
+  // FCM Token
+  static const String fcmToken = '/user/fcm-token';
+
+  // Notifications
+  static const String notifications = '/notifications';
+  static const String notificationsUnreadCount = '/notifications/unread-count';
+  static const String notificationsReadAll = '/notifications/read-all';
+  static const String notificationsClearAll = '/notifications/clear-all';
+  static const String notificationsTypes = '/notifications/types';
+  static String notificationRead(dynamic id) => '/notifications/$id/read';
+  static String notificationDetail(dynamic id) => '/notifications/$id';
 }

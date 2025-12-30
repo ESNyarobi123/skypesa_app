@@ -14,18 +14,21 @@ class NotificationsScreen extends StatefulWidget {
 class _NotificationsScreenState extends State<NotificationsScreen> {
   final _service = NotificationService();
   List<AppNotification> _notifications = [];
+  List<NotificationType> _types = [];
   int _unreadCount = 0;
   bool _isLoading = true;
+  String? _selectedType;
 
   @override
   void initState() {
     super.initState();
     _loadNotifications();
+    _loadTypes();
   }
 
   Future<void> _loadNotifications() async {
     setState(() => _isLoading = true);
-    final result = await _service.getNotifications();
+    final result = await _service.getNotifications(type: _selectedType);
     if (mounted) {
       setState(() {
         _notifications = result.notifications;
@@ -35,8 +38,63 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
+  Future<void> _loadTypes() async {
+    final types = await _service.getNotificationTypes();
+    if (mounted) {
+      setState(() => _types = types);
+    }
+  }
+
   Future<void> _markAllRead() async {
     await _service.markAllAsRead();
+    _loadNotifications();
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Arifa zote zimesomwa')));
+  }
+
+  Future<void> _clearAll() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.card,
+        title: const Text(
+          'Futa Arifa Zote?',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: const Text(
+          'Arifa zote zitafutwa. Hatua hii haiwezi kutenduliwa.',
+          style: TextStyle(color: AppColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Ghairi'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            child: const Text('Futa'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      final result = await _service.clearAllNotifications();
+      if (result.success) {
+        _loadNotifications();
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(result.message)));
+        }
+      }
+    }
+  }
+
+  void _filterByType(String? type) {
+    setState(() => _selectedType = type);
     _loadNotifications();
   }
 
@@ -73,27 +131,120 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ],
         ),
         actions: [
-          if (_unreadCount > 0)
-            TextButton.icon(
-              onPressed: _markAllRead,
-              icon: const Icon(Icons.done_all_rounded, size: 18),
-              label: const Text('Soma Zote'),
-            ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert_rounded),
+            onSelected: (value) {
+              switch (value) {
+                case 'mark_all':
+                  _markAllRead();
+                  break;
+                case 'clear_all':
+                  _clearAll();
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'mark_all',
+                child: Row(
+                  children: [
+                    Icon(Icons.done_all_rounded, size: 20),
+                    Gap(12),
+                    Text('Soma Zote'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'clear_all',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.delete_sweep_rounded,
+                      size: 20,
+                      color: AppColors.error,
+                    ),
+                    Gap(12),
+                    Text('Futa Zote', style: TextStyle(color: AppColors.error)),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _notifications.isEmpty
-          ? _buildEmptyState()
-          : RefreshIndicator(
-              onRefresh: _loadNotifications,
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: _notifications.length,
-                itemBuilder: (ctx, i) =>
-                    _buildNotificationCard(_notifications[i], i),
+      body: Column(
+        children: [
+          // Filter Chips
+          if (_types.isNotEmpty)
+            Container(
+              height: 50,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  _buildFilterChip(null, 'Zote', Icons.notifications_rounded),
+                  const Gap(8),
+                  ..._types.map(
+                    (type) => Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: _buildFilterChip(
+                        type.type,
+                        type.label,
+                        _getIcon(type.icon),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
+          // Content
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _notifications.isEmpty
+                ? _buildEmptyState()
+                : RefreshIndicator(
+                    onRefresh: _loadNotifications,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: _notifications.length,
+                      itemBuilder: (ctx, i) =>
+                          _buildNotificationCard(_notifications[i], i),
+                    ),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(String? type, String label, IconData icon) {
+    final isSelected = _selectedType == type;
+    return FilterChip(
+      selected: isSelected,
+      label: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: isSelected ? Colors.white : AppColors.textSecondary,
+          ),
+          const Gap(6),
+          Text(label),
+        ],
+      ),
+      onSelected: (_) => _filterByType(type),
+      backgroundColor: AppColors.card,
+      selectedColor: AppColors.primary,
+      labelStyle: TextStyle(
+        color: isSelected ? Colors.white : AppColors.textSecondary,
+        fontSize: 12,
+      ),
+      side: BorderSide(
+        color: isSelected ? AppColors.primary : Colors.transparent,
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     );
   }
 

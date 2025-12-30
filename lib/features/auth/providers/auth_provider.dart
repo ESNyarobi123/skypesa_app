@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../models/user_model.dart';
 import '../../../models/blocked_info_model.dart';
 import '../services/auth_service.dart';
+import '../../../core/services/firebase_notification_service.dart';
 
 class AuthProvider with ChangeNotifier {
   final AuthService _authService = AuthService();
@@ -28,6 +29,9 @@ class AuthProvider with ChangeNotifier {
 
       // Check if user is blocked after login
       await checkBlockedStatus();
+
+      // Send FCM token to backend for push notifications
+      await _registerFcmToken();
 
       notifyListeners();
       return true;
@@ -61,6 +65,10 @@ class AuthProvider with ChangeNotifier {
       _user = data['user'];
       _successMessage = data['message'];
       _error = null;
+
+      // Send FCM token to backend for push notifications
+      await _registerFcmToken();
+
       notifyListeners();
       return true;
     } catch (e) {
@@ -73,10 +81,29 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> logout() async {
+    // Delete FCM token from backend before logout
+    try {
+      final fcmService = FirebaseNotificationService();
+      await fcmService.deleteToken();
+    } catch (e) {
+      debugPrint('Error deleting FCM token: $e');
+    }
+
     await _authService.logout();
     _user = null;
     _blockedInfo = null;
     notifyListeners();
+  }
+
+  /// Register FCM token with backend for push notifications
+  Future<void> _registerFcmToken() async {
+    try {
+      final fcmService = FirebaseNotificationService();
+      await fcmService.sendTokenToBackend();
+      debugPrint('FCM token registered with backend');
+    } catch (e) {
+      debugPrint('Error registering FCM token: $e');
+    }
   }
 
   Future<void> checkAuthStatus() async {

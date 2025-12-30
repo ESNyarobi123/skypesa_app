@@ -6,8 +6,8 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
-    // Firebase disabled for now - uncomment when google-services.json is added
-    // id("com.google.gms.google-services")
+    // Google services Gradle plugin for Firebase
+    id("com.google.gms.google-services")
 }
 
 val keystoreProperties = Properties().apply {
@@ -68,8 +68,12 @@ dependencies {
     // Core library desugaring for Java 8+ APIs on older Android
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
     
-    // Firebase disabled for now - uncomment when google-services.json is added
-    // implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
-    // implementation("com.google.firebase:firebase-analytics")
-    // implementation("com.google.firebase:firebase-messaging")
+    // Firebase BoM (Bill of Materials) - manages all Firebase library versions
+    implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
+    
+    // Firebase Analytics (recommended)
+    implementation("com.google.firebase:firebase-analytics")
+    
+    // Firebase Cloud Messaging for push notifications
+    implementation("com.google.firebase:firebase-messaging")
 }
