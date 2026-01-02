@@ -24,7 +24,7 @@ class FirebaseNotificationService {
 
   FirebaseNotificationService._internal();
 
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  late final FirebaseMessaging _firebaseMessaging;
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
 
@@ -49,6 +49,7 @@ class FirebaseNotificationService {
     try {
       // Initialize Firebase
       await Firebase.initializeApp();
+      _firebaseMessaging = FirebaseMessaging.instance;
 
       // Set background message handler
       FirebaseMessaging.onBackgroundMessage(

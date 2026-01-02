@@ -43,11 +43,11 @@ void main() async {
   final notificationService = FirebaseNotificationService();
   await notificationService.initialize();
 
-  // Save FCM token for sending to backend
-  await notificationService.saveToken();
+  // Save FCM token for sending to backend (fire and forget)
+  notificationService.saveToken();
 
-  // Subscribe to general announcements topic
-  await notificationService.subscribeToTopic('announcements');
+  // Subscribe to general announcements topic (fire and forget)
+  notificationService.subscribeToTopic('announcements');
 
   // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
